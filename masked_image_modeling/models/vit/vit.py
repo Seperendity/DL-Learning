@@ -73,31 +73,7 @@ class ImageEncoderViT(nn.Moudle):
         for block in self.blocks:
             x = block(x)
         x = self.norm_layer(x)
-        return x    
-    
-def build_vit(model_name="vit_t", img_size = 224, patch_size = 16, img_dim = 3):
-     if model_name == "vit_t":
-          return ImageEncoderViT(img_size=img_size,
-                                 patch_size=patch_size,
-                                 in_chans=img_dim,
-                                 patch_embed_dim=192,
-                                 depth=12,
-                                 num_heads=3,
-                                 mlp_ratio=4,
-                                 act_layer=nn.GELU,
-                                 dropout=0.1,
-                                 )
-     if model_name == "vit_s":
-          return ImageEncoderViT(img_size=img_size,
-                                 patch_size=patch_size,
-                                 in_chans=img_dim,
-                                 patch_embed_dim=384,
-                                 depth=12,
-                                 num_heads=6,
-                                 mlp_ratio=4,
-                                 act_layer=nn.GELU,
-                                 dropout=0.1,
-                                 )          
+        return x          
 
 if __name__ == '__main__':
      import torch
