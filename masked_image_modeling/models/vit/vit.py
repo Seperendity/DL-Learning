@@ -38,6 +38,16 @@ class ImageEncoderViT(nn.Moudle):
         pos_embed = self.get_posembed(self.pos_embed.shape[-1], int(self.num_patches**.5))
         self.pos_embed.data.copy_(pos_embed)
 
+        # initialize nn.Linear and nn.LayerNorm
+        for m in self.modules():           
+            if isinstance(m, nn.Linear):
+                # we use xavier_uniform following official JAX ViT:
+                torch.nn.init.xavier_uniform_(m.weight)
+                if isinstance(m, nn.Linear) and m.bias is not None:
+                    nn.init.constant_(m.bias, 0)
+            elif isinstance(m, nn.LayerNorm):
+                nn.init.constant_(m.bias, 0)
+                nn.init.constant_(m.weight, 1.0)
 
     def get_posembed(self, embed_dim, grid_size, temperature=10000):
             scale = 2 * torch.pi
@@ -75,6 +85,29 @@ class ImageEncoderViT(nn.Moudle):
         x = self.norm_layer(x)
         return x          
 
+# ------------------------ Model Functions ------------------------
+def build_vit(model_name="vit_t", img_size=224, patch_size=16, img_dim=3):
+    if model_name == "vit_t":
+        return ImageEncoderViT(img_size=img_size,
+                               patch_size=patch_size,
+                               in_chans=img_dim,
+                               patch_embed_dim=192,
+                               depth=12,
+                               num_heads=3,
+                               mlp_ratio=4.0,
+                               act_layer=nn.GELU,
+                               dropout = 0.1)
+    if model_name == "vit_s":
+        return ImageEncoderViT(img_size=img_size,
+                               patch_size=patch_size,
+                               in_chans=img_dim,
+                               patch_embed_dim=384,
+                               depth=12,
+                               num_heads=6,
+                               mlp_ratio=4.0,
+                               act_layer=nn.GELU,
+                               dropout = 0.1)
+    
 if __name__ == '__main__':
      import torch
      from thop import profile
